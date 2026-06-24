@@ -1,12 +1,12 @@
-
-// Firebase SDK Imports
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+```javascript
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 
 import {
   getFirestore
-} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+}
+from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyDeWDl2SM1t50tfxLZE6PWabrjdEnp42kw",
   authDomain: "library-inventory-system-da62c.firebaseapp.com",
@@ -17,10 +17,11 @@ const firebaseConfig = {
   measurementId: "G-7WLDLW85Z9"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app =
+initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
+const db =
+getFirestore(app);
 
 export { db };
-
+```
