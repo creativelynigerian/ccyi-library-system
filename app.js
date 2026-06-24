@@ -67,5 +67,11 @@ ${book.title}
 
 });
 
+window.addBook = addBook;
+window.deleteBook = deleteBook;
+window.loadBooks = loadBooks;
+
+
+
 }
 
