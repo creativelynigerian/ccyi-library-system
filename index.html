@@ -74,6 +74,55 @@ onkeyup="searchBooks()">
 </div>
 
 <script src="app.js"></script>
+### Loan Book Section
+
+<div class="card">
+
+<h2>📖 Loan Book</h2>
+
+<input type="text" id="borrowerName" placeholder="Borrower's Name">
+
+<input type="text" id="borrowerPhone" placeholder="Phone Number">
+
+<input type="text" id="borrowerEmail" placeholder="Email">
+
+<select id="loanBookSelect"></select>
+
+<label>Date Borrowed</label>
+<input type="date" id="borrowDate">
+
+<label>Expected Return Date</label>
+<input type="date" id="dueDate">
+
+<button onclick="loanBook()">
+Loan Book
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>📋 Loan Records</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Borrower</th>
+<th>Book</th>
+<th>Borrowed</th>
+<th>Due Date</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="loanTable"></tbody>
+
+</table>
+
+</div>
+
 
 </body>
 </html>
