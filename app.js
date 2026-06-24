@@ -1,4 +1,4 @@
-```javascript
+
 async function loadBooks(){
 
 const table =
@@ -70,4 +70,4 @@ window.addBook = addBook;
 window.deleteBook = deleteBook;
 
 window.loadBooks = loadBooks;
-```
+
