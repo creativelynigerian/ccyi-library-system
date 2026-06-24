@@ -1,537 +1,345 @@
+// CCYI Library Management System
+
+let books = JSON.parse(localStorage.getItem("books")) || [];
+let loans = JSON.parse(localStorage.getItem("loans")) || [];
 
 // =========================
-// CCYI LIBRARY APP
+// STORAGE
 // =========================
 
-let books =
-JSON.parse(localStorage.getItem("books")) || [];
-
-let loans =
-JSON.parse(localStorage.getItem("loans")) || [];
-
-
-// =========================
-// SAVE FUNCTIONS
-// =========================
-
-function saveBooks(){
-
-localStorage.setItem(
-"books",
-JSON.stringify(books)
-);
-
+function saveBooks() {
+localStorage.setItem("books", JSON.stringify(books));
 }
 
-function saveLoans(){
-
-localStorage.setItem(
-"loans",
-JSON.stringify(loans)
-);
-
+function saveLoans() {
+localStorage.setItem("loans", JSON.stringify(loans));
 }
-
 
 // =========================
-// BOOK FUNCTIONS
+// BOOKS
 // =========================
 
-function addBook(){
+function addBook() {
 
-const title =
-document.getElementById("title").value;
+```
+const title = document.getElementById("title").value.trim();
+const author = document.getElementById("author").value.trim();
+const isbn = document.getElementById("isbn").value.trim();
+const category = document.getElementById("category").value.trim();
+const quantity = parseInt(document.getElementById("quantity").value) || 0;
 
-const author =
-document.getElementById("author").value;
-
-const isbn =
-document.getElementById("isbn").value;
-
-const category =
-document.getElementById("category").value;
-
-const quantity =
-parseInt(
-document.getElementById("quantity").value
-) || 0;
-
-if(!title || !author){
-
-alert("Please enter Title and Author");
-
-return;
-
+if (!title || !author) {
+    alert("Please enter Title and Author");
+    return;
 }
 
-const book = {
-
-id: Date.now(),
-
-title,
-
-author,
-
-isbn,
-
-category,
-
-quantity
-
-};
-
-books.push(book);
-
-saveBooks();
-
-renderBooks();
-
-populateBookDropdown();
-
-updateDashboard();
-
-clearBookForm();
-
-}
-
-function clearBookForm(){
-
-document.getElementById("title").value="";
-document.getElementById("author").value="";
-document.getElementById("isbn").value="";
-document.getElementById("category").value="";
-document.getElementById("quantity").value="";
-
-}
-
-function renderBooks(){
-
-const table =
-document.getElementById("bookTable");
-
-if(!table) return;
-
-table.innerHTML="";
-
-books.forEach(book=>{
-
-table.innerHTML += `
-
-<tr>
-
-<td>${book.title}</td>
-
-<td>${book.author}</td>
-
-<td>${book.isbn}</td>
-
-<td>${book.category}</td>
-
-<td>${book.quantity}</td>
-
-<td>
-
-<button
-onclick="editBook(${book.id})">
-Edit
-</button>
-
-<button
-onclick="deleteBook(${book.id})">
-Delete
-</button>
-
-</td>
-
-</tr>
-
-`;
-
+books.push({
+    id: Date.now(),
+    title,
+    author,
+    isbn,
+    category,
+    quantity
 });
 
-}
-
-function deleteBook(id){
-
-if(!confirm("Delete this book?"))
-return;
-
-books =
-books.filter(
-book => book.id !== id
-);
-
 saveBooks();
-
+clearBookForm();
 renderBooks();
-
 populateBookDropdown();
-
 updateDashboard();
 
+alert("Book Added Successfully");
+```
+
 }
 
-function editBook(id){
+function clearBookForm() {
+document.getElementById("title").value = "";
+document.getElementById("author").value = "";
+document.getElementById("isbn").value = "";
+document.getElementById("category").value = "";
+document.getElementById("quantity").value = "";
+}
 
-const book =
-books.find(
-book => book.id === id
-);
+function renderBooks() {
 
-if(!book) return;
+```
+const table = document.getElementById("bookTable");
+if (!table) return;
 
-document.getElementById("title").value =
-book.title;
+table.innerHTML = "";
 
-document.getElementById("author").value =
-book.author;
+books.forEach(book => {
 
-document.getElementById("isbn").value =
-book.isbn;
+    table.innerHTML += `
+    <tr>
+        <td>${book.title}</td>
+        <td>${book.author}</td>
+        <td>${book.isbn}</td>
+        <td>${book.category}</td>
+        <td>${book.quantity}</td>
+        <td>
+            <button onclick="editBook(${book.id})">Edit</button>
+            <button onclick="deleteBook(${book.id})">Delete</button>
+        </td>
+    </tr>`;
+});
+```
 
-document.getElementById("category").value =
-book.category;
+}
 
-document.getElementById("quantity").value =
-book.quantity;
+function deleteBook(id) {
+
+```
+if (!confirm("Delete this book?")) return;
+
+books = books.filter(book => book.id !== id);
+
+saveBooks();
+renderBooks();
+populateBookDropdown();
+updateDashboard();
+```
+
+}
+
+function editBook(id) {
+
+```
+const book = books.find(book => book.id === id);
+
+if (!book) return;
+
+document.getElementById("title").value = book.title;
+document.getElementById("author").value = book.author;
+document.getElementById("isbn").value = book.isbn;
+document.getElementById("category").value = book.category;
+document.getElementById("quantity").value = book.quantity;
 
 deleteBook(id);
+```
 
 }
 
-function searchBooks(){
+function searchBooks() {
 
+```
 const keyword =
-document
-.getElementById("search")
-.value
-.toLowerCase();
+    document.getElementById("search").value.toLowerCase();
 
-const table =
-document.getElementById("bookTable");
+const table = document.getElementById("bookTable");
 
-table.innerHTML="";
+table.innerHTML = "";
 
 books
-.filter(book =>
+    .filter(book =>
+        book.title.toLowerCase().includes(keyword) ||
+        book.author.toLowerCase().includes(keyword) ||
+        book.category.toLowerCase().includes(keyword)
+    )
+    .forEach(book => {
 
-book.title.toLowerCase().includes(keyword) ||
-
-book.author.toLowerCase().includes(keyword) ||
-
-book.category.toLowerCase().includes(keyword)
-
-)
-
-.forEach(book=>{
-
-table.innerHTML += `
-
-<tr>
-
-<td>${book.title}</td>
-
-<td>${book.author}</td>
-
-<td>${book.isbn}</td>
-
-<td>${book.category}</td>
-
-<td>${book.quantity}</td>
-
-<td>
-
-<button
-onclick="editBook(${book.id})">
-Edit
-</button>
-
-<button
-onclick="deleteBook(${book.id})">
-Delete
-</button>
-
-</td>
-
-</tr>
-
-`;
-
-});
+        table.innerHTML += `
+        <tr>
+            <td>${book.title}</td>
+            <td>${book.author}</td>
+            <td>${book.isbn}</td>
+            <td>${book.category}</td>
+            <td>${book.quantity}</td>
+            <td>
+                <button onclick="editBook(${book.id})">Edit</button>
+                <button onclick="deleteBook(${book.id})">Delete</button>
+            </td>
+        </tr>`;
+    });
+```
 
 }
-
 
 // =========================
-// LOAN FUNCTIONS
+// LOANS
 // =========================
 
-function populateBookDropdown(){
+function populateBookDropdown() {
 
-const select =
-document.getElementById(
-"loanBookSelect"
-);
+```
+const select = document.getElementById("loanBookSelect");
 
-if(!select) return;
+if (!select) return;
 
-select.innerHTML="";
+select.innerHTML = "";
 
-books.forEach(book=>{
+books.forEach(book => {
 
-if(book.quantity > 0){
+    if (book.quantity > 0) {
 
-select.innerHTML +=
-
-`<option value="${book.id}">
-${book.title}
-</option>`;
-
-}
-
+        select.innerHTML += `
+        <option value="${book.id}">
+            ${book.title}
+        </option>`;
+    }
 });
+```
 
 }
 
-function loanBook(){
+function loanBook() {
 
+```
 const borrowerName =
-document.getElementById(
-"borrowerName"
-).value;
+    document.getElementById("borrowerName").value;
 
 const borrowerPhone =
-document.getElementById(
-"borrowerPhone"
-).value;
+    document.getElementById("borrowerPhone").value;
 
 const borrowerEmail =
-document.getElementById(
-"borrowerEmail"
-).value;
+    document.getElementById("borrowerEmail").value;
 
 const bookId =
-Number(
-document.getElementById(
-"loanBookSelect"
-).value
-);
+    Number(document.getElementById("loanBookSelect").value);
 
 const borrowDate =
-document.getElementById(
-"borrowDate"
-).value;
+    document.getElementById("borrowDate").value;
 
 const dueDate =
-document.getElementById(
-"dueDate"
-).value;
+    document.getElementById("dueDate").value;
 
 const book =
-books.find(
-b => b.id === bookId
-);
+    books.find(b => b.id === bookId);
 
-if(!book){
-
-alert("Book not found");
-return;
-
+if (!book) {
+    alert("Book not found");
+    return;
 }
 
 book.quantity--;
 
-const loan = {
-
-id: Date.now(),
-
-borrowerName,
-
-borrowerPhone,
-
-borrowerEmail,
-
-bookId,
-
-bookTitle: book.title,
-
-borrowDate,
-
-dueDate,
-
-status: "Borrowed"
-
-};
-
-loans.push(loan);
+loans.push({
+    id: Date.now(),
+    borrowerName,
+    borrowerPhone,
+    borrowerEmail,
+    bookId,
+    bookTitle: book.title,
+    borrowDate,
+    dueDate,
+    status: "Borrowed"
+});
 
 saveBooks();
-
 saveLoans();
 
 renderBooks();
-
 renderLoans();
-
 populateBookDropdown();
-
 updateDashboard();
-
-alert("Book Loaned Successfully");
-
-}
-
-function renderLoans(){
-
-const table =
-document.getElementById(
-"loanTable"
-);
-
-if(!table) return;
-
-table.innerHTML="";
-
-loans.forEach(loan=>{
-
-let status = loan.status;
-
-if(
-status === "Borrowed" &&
-new Date(loan.dueDate)
-< new Date()
-){
-
-status = "Overdue";
+```
 
 }
 
-table.innerHTML += `
+function renderLoans() {
 
-<tr>
+```
+const table = document.getElementById("loanTable");
 
-<td>${loan.borrowerName}</td>
+if (!table) return;
 
-<td>${loan.bookTitle}</td>
+table.innerHTML = "";
 
-<td>${loan.borrowDate}</td>
+loans.forEach(loan => {
 
-<td>${loan.dueDate}</td>
+    let status = loan.status;
 
-<td>${status}</td>
+    if (
+        status === "Borrowed" &&
+        new Date(loan.dueDate) < new Date()
+    ) {
+        status = "Overdue";
+    }
 
-<td>
-
-<button
-onclick="returnBook(${loan.id})">
-Return
-</button>
-
-</td>
-
-</tr>
-
-`;
-
+    table.innerHTML += `
+    <tr>
+        <td>${loan.borrowerName}</td>
+        <td>${loan.bookTitle}</td>
+        <td>${loan.borrowDate}</td>
+        <td>${loan.dueDate}</td>
+        <td>${status}</td>
+        <td>
+            <button onclick="returnBook(${loan.id})">
+                Return
+            </button>
+        </td>
+    </tr>`;
 });
+```
 
 }
 
-function returnBook(id){
+function returnBook(id) {
 
-const loan =
-loans.find(
-l => l.id === id
-);
+```
+const loan = loans.find(l => l.id === id);
 
-if(!loan) return;
+if (!loan) return;
 
-const book =
-books.find(
-b => b.id === loan.bookId
-);
+const book = books.find(b => b.id === loan.bookId);
 
-if(book){
-
-book.quantity++;
-
+if (book) {
+    book.quantity++;
 }
 
 loan.status = "Returned";
 
 saveBooks();
-
 saveLoans();
 
 renderBooks();
-
 renderLoans();
-
 populateBookDropdown();
-
 updateDashboard();
+```
 
 }
-
 
 // =========================
 // DASHBOARD
 // =========================
 
-function updateDashboard(){
+function updateDashboard() {
 
+```
 const totalBooks =
-document.getElementById(
-"totalBooksCount"
-);
+    document.getElementById("totalBooksCount");
 
 const totalLoans =
-document.getElementById(
-"totalLoansCount"
-);
+    document.getElementById("totalLoansCount");
 
 const overdue =
-document.getElementById(
-"overdueCount"
-);
+    document.getElementById("overdueCount");
 
-if(totalBooks)
-totalBooks.innerText =
-books.length;
+if (totalBooks) totalBooks.textContent = books.length;
+if (totalLoans) totalLoans.textContent = loans.length;
 
-if(totalLoans)
-totalLoans.innerText =
-loans.length;
+if (overdue) {
 
-if(overdue){
+    const count = loans.filter(loan =>
+        loan.status === "Borrowed" &&
+        new Date(loan.dueDate) < new Date()
+    ).length;
 
-const count =
-loans.filter(loan =>
-
-loan.status === "Borrowed" &&
-
-new Date(loan.dueDate)
-< new Date()
-
-).length;
-
-overdue.innerText =
-count;
+    overdue.textContent = count;
+}
+```
 
 }
 
-}
-
-
 // =========================
-// INITIALIZE
+// INIT
 // =========================
 
+document.addEventListener("DOMContentLoaded", () => {
 renderBooks();
-
 renderLoans();
-
 populateBookDropdown();
-
 updateDashboard();
-
+});
