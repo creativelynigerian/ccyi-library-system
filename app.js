@@ -1,3 +1,7 @@
+```javascript
+// =========================
+// CCYI LIBRARY APP
+// =========================
 
 let books =
 JSON.parse(localStorage.getItem("books")) || [];
@@ -6,10 +10,9 @@ let loans =
 JSON.parse(localStorage.getItem("loans")) || [];
 
 
-let books =
-JSON.parse(localStorage.getItem("books")) || [];
-
-renderBooks();
+// =========================
+// SAVE FUNCTIONS
+// =========================
 
 function saveBooks(){
 
@@ -19,6 +22,20 @@ JSON.stringify(books)
 );
 
 }
+
+function saveLoans(){
+
+localStorage.setItem(
+"loans",
+JSON.stringify(loans)
+);
+
+}
+
+
+// =========================
+// BOOK FUNCTIONS
+// =========================
 
 function addBook(){
 
@@ -35,43 +52,55 @@ const category =
 document.getElementById("category").value;
 
 const quantity =
-document.getElementById("quantity").value;
+parseInt(
+document.getElementById("quantity").value
+) || 0;
 
 if(!title || !author){
 
-alert("Please fill required fields");
+alert("Please enter Title and Author");
 
 return;
 
 }
 
-books.push({
+const book = {
 
-id:Date.now(),
+id: Date.now(),
 
 title,
+
 author,
+
 isbn,
+
 category,
+
 quantity
 
-});
+};
+
+books.push(book);
 
 saveBooks();
 
 renderBooks();
 
-clearForm();
+populateBookDropdown();
+
+updateDashboard();
+
+clearBookForm();
 
 }
 
-function clearForm(){
+function clearBookForm(){
 
-title.value="";
-author.value="";
-isbn.value="";
-category.value="";
-quantity.value="";
+document.getElementById("title").value="";
+document.getElementById("author").value="";
+document.getElementById("isbn").value="";
+document.getElementById("category").value="";
+document.getElementById("quantity").value="";
 
 }
 
@@ -80,11 +109,14 @@ function renderBooks(){
 const table =
 document.getElementById("bookTable");
 
+if(!table) return;
+
 table.innerHTML="";
 
 books.forEach(book=>{
 
 table.innerHTML += `
+
 <tr>
 
 <td>${book.title}</td>
@@ -100,13 +132,11 @@ table.innerHTML += `
 <td>
 
 <button
-class="edit"
 onclick="editBook(${book.id})">
 Edit
 </button>
 
 <button
-class="delete"
 onclick="deleteBook(${book.id})">
 Delete
 </button>
@@ -114,6 +144,7 @@ Delete
 </td>
 
 </tr>
+
 `;
 
 });
@@ -122,7 +153,8 @@ Delete
 
 function deleteBook(id){
 
-if(confirm("Delete this book?")){
+if(!confirm("Delete this book?"))
+return;
 
 books =
 books.filter(
@@ -133,7 +165,9 @@ saveBooks();
 
 renderBooks();
 
-}
+populateBookDropdown();
+
+updateDashboard();
 
 }
 
@@ -144,11 +178,22 @@ books.find(
 book => book.id === id
 );
 
-title.value = book.title;
-author.value = book.author;
-isbn.value = book.isbn;
-category.value = book.category;
-quantity.value = book.quantity;
+if(!book) return;
+
+document.getElementById("title").value =
+book.title;
+
+document.getElementById("author").value =
+book.author;
+
+document.getElementById("isbn").value =
+book.isbn;
+
+document.getElementById("category").value =
+book.category;
+
+document.getElementById("quantity").value =
+book.quantity;
 
 deleteBook(id);
 
@@ -162,8 +207,13 @@ document
 .value
 .toLowerCase();
 
-const filtered =
-books.filter(book =>
+const table =
+document.getElementById("bookTable");
+
+table.innerHTML="";
+
+books
+.filter(book =>
 
 book.title.toLowerCase().includes(keyword) ||
 
@@ -171,16 +221,12 @@ book.author.toLowerCase().includes(keyword) ||
 
 book.category.toLowerCase().includes(keyword)
 
-);
+)
 
-const table =
-document.getElementById("bookTable");
-
-table.innerHTML="";
-
-filtered.forEach(book=>{
+.forEach(book=>{
 
 table.innerHTML += `
+
 <tr>
 
 <td>${book.title}</td>
@@ -196,13 +242,11 @@ table.innerHTML += `
 <td>
 
 <button
-class="edit"
 onclick="editBook(${book.id})">
 Edit
 </button>
 
 <button
-class="delete"
 onclick="deleteBook(${book.id})">
 Delete
 </button>
@@ -210,9 +254,284 @@ Delete
 </td>
 
 </tr>
+
 `;
 
 });
 
 }
 
+
+// =========================
+// LOAN FUNCTIONS
+// =========================
+
+function populateBookDropdown(){
+
+const select =
+document.getElementById(
+"loanBookSelect"
+);
+
+if(!select) return;
+
+select.innerHTML="";
+
+books.forEach(book=>{
+
+if(book.quantity > 0){
+
+select.innerHTML +=
+
+`<option value="${book.id}">
+${book.title}
+</option>`;
+
+}
+
+});
+
+}
+
+function loanBook(){
+
+const borrowerName =
+document.getElementById(
+"borrowerName"
+).value;
+
+const borrowerPhone =
+document.getElementById(
+"borrowerPhone"
+).value;
+
+const borrowerEmail =
+document.getElementById(
+"borrowerEmail"
+).value;
+
+const bookId =
+Number(
+document.getElementById(
+"loanBookSelect"
+).value
+);
+
+const borrowDate =
+document.getElementById(
+"borrowDate"
+).value;
+
+const dueDate =
+document.getElementById(
+"dueDate"
+).value;
+
+const book =
+books.find(
+b => b.id === bookId
+);
+
+if(!book){
+
+alert("Book not found");
+return;
+
+}
+
+book.quantity--;
+
+const loan = {
+
+id: Date.now(),
+
+borrowerName,
+
+borrowerPhone,
+
+borrowerEmail,
+
+bookId,
+
+bookTitle: book.title,
+
+borrowDate,
+
+dueDate,
+
+status: "Borrowed"
+
+};
+
+loans.push(loan);
+
+saveBooks();
+
+saveLoans();
+
+renderBooks();
+
+renderLoans();
+
+populateBookDropdown();
+
+updateDashboard();
+
+alert("Book Loaned Successfully");
+
+}
+
+function renderLoans(){
+
+const table =
+document.getElementById(
+"loanTable"
+);
+
+if(!table) return;
+
+table.innerHTML="";
+
+loans.forEach(loan=>{
+
+let status = loan.status;
+
+if(
+status === "Borrowed" &&
+new Date(loan.dueDate)
+< new Date()
+){
+
+status = "Overdue";
+
+}
+
+table.innerHTML += `
+
+<tr>
+
+<td>${loan.borrowerName}</td>
+
+<td>${loan.bookTitle}</td>
+
+<td>${loan.borrowDate}</td>
+
+<td>${loan.dueDate}</td>
+
+<td>${status}</td>
+
+<td>
+
+<button
+onclick="returnBook(${loan.id})">
+Return
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+}
+
+function returnBook(id){
+
+const loan =
+loans.find(
+l => l.id === id
+);
+
+if(!loan) return;
+
+const book =
+books.find(
+b => b.id === loan.bookId
+);
+
+if(book){
+
+book.quantity++;
+
+}
+
+loan.status = "Returned";
+
+saveBooks();
+
+saveLoans();
+
+renderBooks();
+
+renderLoans();
+
+populateBookDropdown();
+
+updateDashboard();
+
+}
+
+
+// =========================
+// DASHBOARD
+// =========================
+
+function updateDashboard(){
+
+const totalBooks =
+document.getElementById(
+"totalBooksCount"
+);
+
+const totalLoans =
+document.getElementById(
+"totalLoansCount"
+);
+
+const overdue =
+document.getElementById(
+"overdueCount"
+);
+
+if(totalBooks)
+totalBooks.innerText =
+books.length;
+
+if(totalLoans)
+totalLoans.innerText =
+loans.length;
+
+if(overdue){
+
+const count =
+loans.filter(loan =>
+
+loan.status === "Borrowed" &&
+
+new Date(loan.dueDate)
+< new Date()
+
+).length;
+
+overdue.innerText =
+count;
+
+}
+
+}
+
+
+// =========================
+// INITIALIZE
+// =========================
+
+renderBooks();
+
+renderLoans();
+
+populateBookDropdown();
+
+updateDashboard();
+```
