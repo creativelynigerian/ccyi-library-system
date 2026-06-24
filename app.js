@@ -1,72 +1,20 @@
-
-import { db } from "./firebase-config.js";
-
-import {
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc
-}
-from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-
-const booksCollection =
-collection(db, "books");
-
-async function addBook(){
-
-const title =
-document.getElementById("title").value;
-
-const author =
-document.getElementById("author").value;
-
-const isbn =
-document.getElementById("isbn").value;
-
-const category =
-document.getElementById("category").value;
-
-const quantity =
-parseInt(
-document.getElementById("quantity").value
-) || 0;
-
-if(!title || !author){
-
-alert("Title and Author Required");
-
-return;
-
-}
-
-await addDoc(
-booksCollection,
-{
-title,
-author,
-isbn,
-category,
-quantity,
-createdAt:
-new Date()
-}
-);
-
-alert("Book Added");
-
-loadBooks();
-
-}
-
+```javascript
 async function loadBooks(){
 
 const table =
-document.getElementById(
-"bookTable"
-);
+document.getElementById("bookTable");
+
+const dropdown =
+document.getElementById("loanBookSelect");
 
 table.innerHTML = "";
+
+if(dropdown){
+
+dropdown.innerHTML =
+'<option value="">Select Book</option>';
+
+}
 
 const snapshot =
 await getDocs(
@@ -105,23 +53,19 @@ Delete
 
 `;
 
+if(dropdown){
+
+dropdown.innerHTML += `
+
+<option value="${docItem.id}">
+${book.title}
+</option>
+
+`;
+
+}
+
 });
 
 }
-
-window.deleteBook =
-async function(id){
-
-await deleteDoc(
-doc(db,"books",id)
-);
-
-loadBooks();
-
-}
-
-window.addBook =
-addBook;
-
-loadBooks();
-
+```
