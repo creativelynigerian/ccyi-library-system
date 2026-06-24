@@ -1,4 +1,11 @@
-```javascript
+
+let books =
+JSON.parse(localStorage.getItem("books")) || [];
+
+let loans =
+JSON.parse(localStorage.getItem("loans")) || [];
+
+
 let books =
 JSON.parse(localStorage.getItem("books")) || [];
 
@@ -208,4 +215,4 @@ Delete
 });
 
 }
-```
+
