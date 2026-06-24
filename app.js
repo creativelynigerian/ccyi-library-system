@@ -1,4 +1,4 @@
-```javascript
+
 import { db } from "./firebase-config.js";
 
 import {
@@ -124,4 +124,4 @@ window.addBook =
 addBook;
 
 loadBooks();
-```
+
