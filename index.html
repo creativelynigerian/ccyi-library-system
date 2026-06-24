@@ -1,1 +1,80 @@
-<!DOCTYPE html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>CCYI Library V2</title><link rel='stylesheet' href='style.css'></head><body><h1>CCYI Library Management System</h1><input id='title' placeholder='Title'><input id='author' placeholder='Author'><button onclick='addBook()'>Add Book</button><table><tbody id='bookTable'></tbody></table><script src='app.js'></script></body></html>
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCYI Library Inventory</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+<h1>📚 CCYI Library Inventory System</h1>
+<p>Manage Your Book Collection</p>
+</header>
+
+<div class="card">
+
+<h2>Add New Book</h2>
+
+<input type="text" id="title" placeholder="Book Title">
+
+<input type="text" id="author" placeholder="Author">
+
+<input type="text" id="isbn" placeholder="ISBN">
+
+<input type="text" id="category" placeholder="Category">
+
+<input type="number" id="quantity" placeholder="Quantity">
+
+<button onclick="addBook()">Add Book</button>
+
+</div>
+
+<div class="card">
+
+<h2>Search Books</h2>
+
+<input
+type="text"
+id="search"
+placeholder="Search title, author or category"
+onkeyup="searchBooks()">
+
+</div>
+
+<div class="card">
+
+<h2>Inventory</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Title</th>
+<th>Author</th>
+<th>ISBN</th>
+<th>Category</th>
+<th>Qty</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="bookTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
+```
