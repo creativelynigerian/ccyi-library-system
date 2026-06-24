@@ -1,4 +1,4 @@
-```javascript
+
 // =========================
 // CCYI LIBRARY APP
 // =========================
@@ -534,4 +534,4 @@ renderLoans();
 populateBookDropdown();
 
 updateDashboard();
-```
+
