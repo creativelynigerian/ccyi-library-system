@@ -1,12 +1,18 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CCYI Library Inventory</title>
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>CCYI Library Management System</title>
 
 <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
@@ -14,90 +20,217 @@
 <div class="container">
 
 <header>
-<h1>📚 CCYI Library Inventory System</h1>
-<p>Manage Your Book Collection</p>
+
+<h1>📚 CCYI Library Management System</h1>
+
+<p>
+Inventory Management, Book Loans
+and Borrower Tracking
+</p>
+
 </header>
+
+
+<!-- DASHBOARD -->
 
 <div class="card">
 
-<h2>Add New Book</h2>
+<h2>📊 Library Statistics</h2>
 
-<input type="text" id="title" placeholder="Book Title">
+<div class="stats">
 
-<input type="text" id="author" placeholder="Author">
+<p>
+Total Books:
+<strong id="totalBooksCount">0</strong>
+</p>
 
-<input type="text" id="isbn" placeholder="ISBN">
+<p>
+Total Loans:
+<strong id="totalLoansCount">0</strong>
+</p>
 
-<input type="text" id="category" placeholder="Category">
-
-<input type="number" id="quantity" placeholder="Quantity">
-
-<button onclick="addBook()">Add Book</button>
+<p>
+Overdue Books:
+<strong id="overdueCount">0</strong>
+</p>
 
 </div>
 
+</div>
+
+
+<!-- ADD BOOK -->
+
 <div class="card">
 
-<h2>Search Books</h2>
+<h2>➕ Add New Book</h2>
 
 <input
 type="text"
+id="title"
+placeholder="Book Title">
+
+<input
+type="text"
+id="author"
+placeholder="Author">
+
+<input
+type="text"
+id="isbn"
+placeholder="ISBN">
+
+<input
+type="text"
+id="category"
+placeholder="Category">
+
+<input
+type="number"
+id="quantity"
+placeholder="Quantity">
+
+<button onclick="addBook()">
+Add Book
+</button>
+
+</div>
+
+
+<!-- SEARCH -->
+
+<div class="card">
+
+<h2>🔍 Search Books</h2>
+
+<input
+
+type="text"
+
 id="search"
-placeholder="Search title, author or category"
+
+placeholder="Search by title, author or category"
+
 onkeyup="searchBooks()">
 
 </div>
 
+
+<!-- INVENTORY -->
+
 <div class="card">
 
-<h2>Inventory</h2>
+<h2>📚 Book Inventory</h2>
 
 <table>
 
 <thead>
+
 <tr>
+
 <th>Title</th>
+
 <th>Author</th>
+
 <th>ISBN</th>
+
 <th>Category</th>
+
 <th>Qty</th>
+
 <th>Actions</th>
+
 </tr>
+
 </thead>
 
-<tbody id="bookTable"></tbody>
+<tbody id="bookTable">
+
+</tbody>
 
 </table>
 
 </div>
 
-</div>
 
-<script src="app.js"></script>
+<!-- LOAN BOOK -->
 
 <div class="card">
 
 <h2>📖 Loan Book</h2>
 
-<input type="text" id="borrowerName" placeholder="Borrower's Name">
+<input
 
-<input type="text" id="borrowerPhone" placeholder="Phone Number">
+type="text"
 
-<input type="text" id="borrowerEmail" placeholder="Email">
+id="borrowerName"
 
-<select id="loanBookSelect"></select>
+placeholder="Borrower's Name">
 
-<label>Date Borrowed</label>
-<input type="date" id="borrowDate">
+<input
 
-<label>Expected Return Date</label>
-<input type="date" id="dueDate">
+type="text"
+
+id="borrowerPhone"
+
+placeholder="Phone Number">
+
+<input
+
+type="email"
+
+id="borrowerEmail"
+
+placeholder="Email Address">
+
+<label>
+
+Book
+
+</label>
+
+<select id="loanBookSelect">
+
+<option>
+Select Book
+</option>
+
+</select>
+
+<label>
+
+Date Borrowed
+
+</label>
+
+<input
+
+type="date"
+
+id="borrowDate">
+
+<label>
+
+Expected Return Date
+
+</label>
+
+<input
+
+type="date"
+
+id="dueDate">
 
 <button onclick="loanBook()">
+
 Loan Book
+
 </button>
 
 </div>
+
+
+<!-- LOAN RECORDS -->
 
 <div class="card">
 
@@ -106,39 +239,39 @@ Loan Book
 <table>
 
 <thead>
+
 <tr>
+
 <th>Borrower</th>
+
 <th>Book</th>
-<th>Borrowed</th>
+
+<th>Borrow Date</th>
+
 <th>Due Date</th>
+
 <th>Status</th>
+
 <th>Action</th>
+
 </tr>
+
 </thead>
 
-<tbody id="loanTable"></tbody>
+<tbody id="loanTable">
+
+</tbody>
 
 </table>
 
 </div>
- 
-<div class="card">
 
-<h2>Library Statistics</h2>
-
-<p>Total Books:
-<span id="totalBooksCount">0</span></p>
-
-<p>Total Loans:
-<span id="totalLoansCount">0</span></p>
-
-<p>Overdue Books:
-<span id="overdueCount">0</span></p>
 
 </div>
 
-
-
+<script src="app.js"></script>
 
 </body>
+
 </html>
+```
