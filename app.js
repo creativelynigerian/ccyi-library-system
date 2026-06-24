@@ -1,4 +1,4 @@
-```javascript
+
 async function loadBooks(){
 
 const table =
@@ -68,4 +68,4 @@ ${book.title}
 });
 
 }
-```
+
