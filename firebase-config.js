@@ -1,4 +1,4 @@
-```javascript
+
 import { initializeApp }
 from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 
@@ -24,4 +24,4 @@ const db =
 getFirestore(app);
 
 export { db };
-```
+
