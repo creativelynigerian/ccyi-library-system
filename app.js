@@ -1,4 +1,4 @@
-
+```javascript
 async function loadBooks(){
 
 const table =
@@ -29,15 +29,10 @@ docItem.data();
 table.innerHTML += `
 
 <tr>
-
 <td>${book.title}</td>
-
 <td>${book.author}</td>
-
 <td>${book.isbn}</td>
-
 <td>${book.category}</td>
-
 <td>${book.quantity}</td>
 
 <td>
@@ -56,22 +51,23 @@ Delete
 if(dropdown){
 
 dropdown.innerHTML += `
-
 <option value="${docItem.id}">
 ${book.title}
 </option>
-
 `;
 
 }
 
 });
 
-window.addBook = addBook;
-window.deleteBook = deleteBook;
-window.loadBooks = loadBooks;
-
-
-
 }
 
+
+// THESE MUST BE OUTSIDE THE FUNCTION
+
+window.addBook = addBook;
+
+window.deleteBook = deleteBook;
+
+window.loadBooks = loadBooks;
+```
