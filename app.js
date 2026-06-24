@@ -1,345 +1,127 @@
-// CCYI Library Management System
+```javascript
+import { db } from "./firebase-config.js";
 
-let books = JSON.parse(localStorage.getItem("books")) || [];
-let loans = JSON.parse(localStorage.getItem("loans")) || [];
-
-// =========================
-// STORAGE
-// =========================
-
-function saveBooks() {
-localStorage.setItem("books", JSON.stringify(books));
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc
 }
+from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-function saveLoans() {
-localStorage.setItem("loans", JSON.stringify(loans));
-}
+const booksCollection =
+collection(db, "books");
 
-// =========================
-// BOOKS
-// =========================
+async function addBook(){
 
-function addBook() {
+const title =
+document.getElementById("title").value;
 
-```
-const title = document.getElementById("title").value.trim();
-const author = document.getElementById("author").value.trim();
-const isbn = document.getElementById("isbn").value.trim();
-const category = document.getElementById("category").value.trim();
-const quantity = parseInt(document.getElementById("quantity").value) || 0;
+const author =
+document.getElementById("author").value;
 
-if (!title || !author) {
-    alert("Please enter Title and Author");
-    return;
-}
+const isbn =
+document.getElementById("isbn").value;
 
-books.push({
-    id: Date.now(),
-    title,
-    author,
-    isbn,
-    category,
-    quantity
-});
+const category =
+document.getElementById("category").value;
 
-saveBooks();
-clearBookForm();
-renderBooks();
-populateBookDropdown();
-updateDashboard();
+const quantity =
+parseInt(
+document.getElementById("quantity").value
+) || 0;
 
-alert("Book Added Successfully");
-```
+if(!title || !author){
+
+alert("Title and Author Required");
+
+return;
 
 }
 
-function clearBookForm() {
-document.getElementById("title").value = "";
-document.getElementById("author").value = "";
-document.getElementById("isbn").value = "";
-document.getElementById("category").value = "";
-document.getElementById("quantity").value = "";
+await addDoc(
+booksCollection,
+{
+title,
+author,
+isbn,
+category,
+quantity,
+createdAt:
+new Date()
+}
+);
+
+alert("Book Added");
+
+loadBooks();
+
 }
 
-function renderBooks() {
+async function loadBooks(){
 
-```
-const table = document.getElementById("bookTable");
-if (!table) return;
+const table =
+document.getElementById(
+"bookTable"
+);
 
 table.innerHTML = "";
 
-books.forEach(book => {
+const snapshot =
+await getDocs(
+booksCollection
+);
 
-    table.innerHTML += `
-    <tr>
-        <td>${book.title}</td>
-        <td>${book.author}</td>
-        <td>${book.isbn}</td>
-        <td>${book.category}</td>
-        <td>${book.quantity}</td>
-        <td>
-            <button onclick="editBook(${book.id})">Edit</button>
-            <button onclick="deleteBook(${book.id})">Delete</button>
-        </td>
-    </tr>`;
-});
-```
-
-}
-
-function deleteBook(id) {
-
-```
-if (!confirm("Delete this book?")) return;
-
-books = books.filter(book => book.id !== id);
-
-saveBooks();
-renderBooks();
-populateBookDropdown();
-updateDashboard();
-```
-
-}
-
-function editBook(id) {
-
-```
-const book = books.find(book => book.id === id);
-
-if (!book) return;
-
-document.getElementById("title").value = book.title;
-document.getElementById("author").value = book.author;
-document.getElementById("isbn").value = book.isbn;
-document.getElementById("category").value = book.category;
-document.getElementById("quantity").value = book.quantity;
-
-deleteBook(id);
-```
-
-}
-
-function searchBooks() {
-
-```
-const keyword =
-    document.getElementById("search").value.toLowerCase();
-
-const table = document.getElementById("bookTable");
-
-table.innerHTML = "";
-
-books
-    .filter(book =>
-        book.title.toLowerCase().includes(keyword) ||
-        book.author.toLowerCase().includes(keyword) ||
-        book.category.toLowerCase().includes(keyword)
-    )
-    .forEach(book => {
-
-        table.innerHTML += `
-        <tr>
-            <td>${book.title}</td>
-            <td>${book.author}</td>
-            <td>${book.isbn}</td>
-            <td>${book.category}</td>
-            <td>${book.quantity}</td>
-            <td>
-                <button onclick="editBook(${book.id})">Edit</button>
-                <button onclick="deleteBook(${book.id})">Delete</button>
-            </td>
-        </tr>`;
-    });
-```
-
-}
-
-// =========================
-// LOANS
-// =========================
-
-function populateBookDropdown() {
-
-```
-const select = document.getElementById("loanBookSelect");
-
-if (!select) return;
-
-select.innerHTML = "";
-
-books.forEach(book => {
-
-    if (book.quantity > 0) {
-
-        select.innerHTML += `
-        <option value="${book.id}">
-            ${book.title}
-        </option>`;
-    }
-});
-```
-
-}
-
-function loanBook() {
-
-```
-const borrowerName =
-    document.getElementById("borrowerName").value;
-
-const borrowerPhone =
-    document.getElementById("borrowerPhone").value;
-
-const borrowerEmail =
-    document.getElementById("borrowerEmail").value;
-
-const bookId =
-    Number(document.getElementById("loanBookSelect").value);
-
-const borrowDate =
-    document.getElementById("borrowDate").value;
-
-const dueDate =
-    document.getElementById("dueDate").value;
+snapshot.forEach(docItem=>{
 
 const book =
-    books.find(b => b.id === bookId);
+docItem.data();
 
-if (!book) {
-    alert("Book not found");
-    return;
-}
+table.innerHTML += `
 
-book.quantity--;
+<tr>
 
-loans.push({
-    id: Date.now(),
-    borrowerName,
-    borrowerPhone,
-    borrowerEmail,
-    bookId,
-    bookTitle: book.title,
-    borrowDate,
-    dueDate,
-    status: "Borrowed"
+<td>${book.title}</td>
+
+<td>${book.author}</td>
+
+<td>${book.isbn}</td>
+
+<td>${book.category}</td>
+
+<td>${book.quantity}</td>
+
+<td>
+
+<button
+onclick="deleteBook('${docItem.id}')">
+Delete
+</button>
+
+</td>
+
+</tr>
+
+`;
+
 });
 
-saveBooks();
-saveLoans();
+}
 
-renderBooks();
-renderLoans();
-populateBookDropdown();
-updateDashboard();
-```
+window.deleteBook =
+async function(id){
+
+await deleteDoc(
+doc(db,"books",id)
+);
+
+loadBooks();
 
 }
 
-function renderLoans() {
+window.addBook =
+addBook;
 
+loadBooks();
 ```
-const table = document.getElementById("loanTable");
-
-if (!table) return;
-
-table.innerHTML = "";
-
-loans.forEach(loan => {
-
-    let status = loan.status;
-
-    if (
-        status === "Borrowed" &&
-        new Date(loan.dueDate) < new Date()
-    ) {
-        status = "Overdue";
-    }
-
-    table.innerHTML += `
-    <tr>
-        <td>${loan.borrowerName}</td>
-        <td>${loan.bookTitle}</td>
-        <td>${loan.borrowDate}</td>
-        <td>${loan.dueDate}</td>
-        <td>${status}</td>
-        <td>
-            <button onclick="returnBook(${loan.id})">
-                Return
-            </button>
-        </td>
-    </tr>`;
-});
-```
-
-}
-
-function returnBook(id) {
-
-```
-const loan = loans.find(l => l.id === id);
-
-if (!loan) return;
-
-const book = books.find(b => b.id === loan.bookId);
-
-if (book) {
-    book.quantity++;
-}
-
-loan.status = "Returned";
-
-saveBooks();
-saveLoans();
-
-renderBooks();
-renderLoans();
-populateBookDropdown();
-updateDashboard();
-```
-
-}
-
-// =========================
-// DASHBOARD
-// =========================
-
-function updateDashboard() {
-
-```
-const totalBooks =
-    document.getElementById("totalBooksCount");
-
-const totalLoans =
-    document.getElementById("totalLoansCount");
-
-const overdue =
-    document.getElementById("overdueCount");
-
-if (totalBooks) totalBooks.textContent = books.length;
-if (totalLoans) totalLoans.textContent = loans.length;
-
-if (overdue) {
-
-    const count = loans.filter(loan =>
-        loan.status === "Borrowed" &&
-        new Date(loan.dueDate) < new Date()
-    ).length;
-
-    overdue.textContent = count;
-}
-```
-
-}
-
-// =========================
-// INIT
-// =========================
-
-document.addEventListener("DOMContentLoaded", () => {
-renderBooks();
-renderLoans();
-populateBookDropdown();
-updateDashboard();
-});
