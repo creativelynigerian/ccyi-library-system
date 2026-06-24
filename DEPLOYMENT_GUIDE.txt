@@ -1,0 +1,1 @@
+Upload to GitHub, enable Pages, deploy Apps Script, connect Telegram.
