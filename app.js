@@ -1,70 +1,78 @@
+```javascript id="bspm7x"
+async function addBook() {
 
-async function loadBooks() {
+    const title =
+        document.getElementById("title").value;
 
-    const table = document.getElementById("bookTable");
-    const dropdown = document.getElementById("loanBookSelect");
+    const author =
+        document.getElementById("author").value;
 
-    if (!table) return;
+    const isbn =
+        document.getElementById("isbn").value;
 
-    table.innerHTML = "";
+    const category =
+        document.getElementById("category").value;
 
-    if (dropdown) {
-        dropdown.innerHTML =
-            '<option value="">Select Book</option>';
+    const quantity =
+        parseInt(
+            document.getElementById("quantity").value
+        ) || 0;
+
+    if (!title || !author) {
+
+        alert("Please enter Title and Author");
+
+        return;
     }
 
     try {
 
-        const snapshot =
-            await getDocs(booksCollection);
-
-        snapshot.forEach((docItem) => {
-
-            const book = docItem.data();
-
-            const row = `
-                <tr>
-                    <td>${book.title || ""}</td>
-                    <td>${book.author || ""}</td>
-                    <td>${book.isbn || ""}</td>
-                    <td>${book.category || ""}</td>
-                    <td>${book.quantity || 0}</td>
-                    <td>
-                        <button onclick="deleteBook('${docItem.id}')">
-                            Delete
-                        </button>
-                    </td>
-                </tr>
-            `;
-
-            table.innerHTML += row;
-
-            if (dropdown) {
-
-                dropdown.innerHTML += `
-                    <option value="${docItem.id}">
-                        ${book.title}
-                    </option>
-                `;
+        await addDoc(
+            booksCollection,
+            {
+                title,
+                author,
+                isbn,
+                category,
+                quantity,
+                createdAt: new Date()
             }
+        );
 
-        });
+        alert("Book Added Successfully");
+
+        loadBooks();
 
     } catch (error) {
 
-        console.error(
-            "Error loading books:",
-            error
-        );
+        console.error(error);
+
+        alert("Error adding book");
 
     }
 
 }
+```
+```javascript id="vtz34h"
+async function deleteBook(id) {
 
+    try {
 
-// Make functions available to HTML buttons
+        await deleteDoc(
+            doc(
+                db,
+                "books",
+                id
+            )
+        );
 
-window.addBook = addBook;
-window.deleteBook = deleteBook;
-window.loadBooks = loadBooks;
+        loadBooks();
 
+    } catch(error) {
+
+        console.error(error);
+
+    }
+
+}
+```
