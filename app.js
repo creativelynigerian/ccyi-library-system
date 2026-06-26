@@ -1,7 +1,5 @@
 // ======================================================
 // CCYI LIBRARY MANAGEMENT SYSTEM
-// app.js
-// Part 1
 // ======================================================
 
 import { db } from "./firebase-config.js";
@@ -15,9 +13,9 @@ import {
     deleteDoc,
     doc,
     query,
-    orderBy
+    orderBy,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-
 
 // ======================================================
 // FIRESTORE COLLECTIONS
@@ -664,8 +662,6 @@ async function loadLoans() {
 
 }
 
-
-
 // ---------------------------
 // Return Book
 // ---------------------------
@@ -755,3 +751,20 @@ async function returnBook(loanId, bookId) {
     }
 
 }
+// ======================================================
+// GLOBAL FUNCTIONS
+// ======================================================
+
+window.addBook = addBook;
+window.loanBook = loanBook;
+window.returnBook = returnBook;
+window.deleteBook = deleteBook;
+window.editBook = editBook;
+window.searchBooks = searchBooks;
+
+
+// ======================================================
+// START APPLICATION
+// ======================================================
+
+init();
