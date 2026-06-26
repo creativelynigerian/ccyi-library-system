@@ -18,7 +18,8 @@ import {
 
 const booksCollection =
     collection(db, "books");
-
+const loansCollection = 
+    collection(db, "loans");
 
 // =========================
 // ADD BOOK
