@@ -1,3 +1,8 @@
+// ======================================================
+// CCYI LIBRARY MANAGEMENT SYSTEM
+// app.js
+// Part 1
+// ======================================================
 
 import { db } from "./firebase-config.js";
 
@@ -5,16 +10,177 @@ import {
     collection,
     addDoc,
     getDocs,
-    deleteDoc,
-    updateDoc,
     getDoc,
-    doc
+    updateDoc,
+    deleteDoc,
+    doc,
+    query,
+    orderBy
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 
-// =========================
-// COLLECTIONS
-// =========================
+// ======================================================
+// FIRESTORE COLLECTIONS
+// ======================================================
+
+const booksCollection = collection(db, "books");
+const loansCollection = collection(db, "loans");
+
+
+// ======================================================
+// DOM ELEMENTS
+// ======================================================
+
+const bookTable = document.getElementById("bookTable");
+const loanTable = document.getElementById("loanTable");
+
+const loanBookSelect =
+    document.getElementById("loanBookSelect");
+
+
+// Dashboard
+
+const totalBooks =
+    document.getElementById("totalBooksCount");
+
+const totalLoans =
+    document.getElementById("totalLoansCount");
+
+const overdueBooks =
+    document.getElementById("overdueCount");
+
+
+// ======================================================
+// HELPER FUNCTIONS
+// ======================================================
+
+function showMessage(message) {
+    alert(message);
+}
+
+function clearBookForm() {
+
+    document.getElementById("title").value = "";
+    document.getElementById("author").value = "";
+    document.getElementById("isbn").value = "";
+    document.getElementById("category").value = "";
+    document.getElementById("quantity").value = "";
+
+}
+
+function clearLoanForm(){
+
+    document.getElementById("borrowerName").value="";
+    document.getElementById("borrowerPhone").value="";
+    document.getElementById("borrowerEmail").value="";
+    document.getElementById("loanBookSelect").value="";
+    document.getElementById("borrowDate").value="";
+    document.getElementById("dueDate").value="";
+
+}
+
+
+function formatDate(date){
+
+    if(!date) return "";
+
+    return new Date(date).toLocaleDateString();
+
+}
+
+
+// ======================================================
+// DASHBOARD
+// ======================================================
+
+async function updateDashboard(){
+
+    try{
+
+        const booksSnapshot =
+            await getDocs(booksCollection);
+
+        const loansSnapshot =
+            await getDocs(loansCollection);
+
+        totalBooks.textContent =
+            booksSnapshot.size;
+
+        let activeLoans = 0;
+
+        let overdue = 0;
+
+        const today = new Date();
+
+        loansSnapshot.forEach(docItem=>{
+
+            const loan = docItem.data();
+
+            if(loan.status==="Borrowed"){
+
+                activeLoans++;
+
+                if(new Date(loan.dueDate) < today){
+
+                    overdue++;
+
+                }
+
+            }
+
+        });
+
+        totalLoans.textContent =
+            activeLoans;
+
+        overdueBooks.textContent =
+            overdue;
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+
+// ======================================================
+// INITIALIZE APP
+// ======================================================
+
+async function init(){
+
+    try{
+
+        await Promise.all([
+
+            loadBooks(),
+
+            loadLoans(),
+
+            updateDashboard()
+
+        ]);
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+    }
+
+}
+// ======================================================
+// BOOK MANAGEMENT
+// ======================================================
+
+// ---------------------------
+// Add Book
+// ---------------------------
 
 async function addBook() {
 
@@ -27,7 +193,7 @@ async function addBook() {
         const quantity = parseInt(document.getElementById("quantity").value) || 0;
 
         if (!title || !author) {
-            alert("Title and Author are required.");
+            showMessage("Book title and author are required.");
             return;
         }
 
@@ -40,300 +206,552 @@ async function addBook() {
             createdAt: new Date()
         });
 
-        ["title","author","isbn","category","quantity"].forEach(id=>{
-            document.getElementById(id).value="";
-        });
+        clearBookForm();
 
         await loadBooks();
         await updateDashboard();
 
-        alert("Book added successfully.");
+        showMessage("Book added successfully.");
 
-    } catch(err){
+    } catch (error) {
 
-        console.error(err);
-        alert("Unable to add book.");
+        console.error(error);
+        showMessage("Unable to add book.");
 
     }
 
 }
-// =========================
-// LOAD BOOKS
-// =========================
 
-async function loadBooks(){
 
-    const table = document.getElementById("bookTable");
-    const dropdown = document.getElementById("loanBookSelect");
 
-    table.innerHTML="";
-    dropdown.innerHTML='<option value="">Select Book</option>';
+// ---------------------------
+// Load Books
+// ---------------------------
 
-    try{
+async function loadBooks() {
 
-        const snapshot = await getDocs(booksCollection);
+    try {
 
-        snapshot.forEach(bookDoc=>{
+        bookTable.innerHTML = "";
+
+        loanBookSelect.innerHTML =
+            `<option value="">Select Book</option>`;
+
+        const q = query(
+            booksCollection,
+            orderBy("title")
+        );
+
+        const snapshot = await getDocs(q);
+
+        snapshot.forEach((bookDoc) => {
 
             const book = bookDoc.data();
 
-            table.innerHTML += `
+            bookTable.innerHTML += `
+
             <tr>
+
                 <td>${book.title}</td>
+
                 <td>${book.author}</td>
-                <td>${book.isbn}</td>
-                <td>${book.category}</td>
+
+                <td>${book.isbn || ""}</td>
+
+                <td>${book.category || ""}</td>
+
                 <td>${book.quantity}</td>
+
                 <td>
-                    <button onclick="deleteBook('${bookDoc.id}')">
-                        Delete
+
+                    <button
+                        onclick="editBook('${bookDoc.id}')">
+
+                        Edit
+
                     </button>
+
+                    <button
+                        onclick="deleteBook('${bookDoc.id}')">
+
+                        Delete
+
+                    </button>
+
                 </td>
+
             </tr>
+
             `;
 
-            if(book.quantity>0){
+            if (book.quantity > 0) {
 
-                dropdown.innerHTML += `
-                    <option value="${bookDoc.id}">
-                        ${book.title} (${book.quantity} available)
-                    </option>
+                loanBookSelect.innerHTML += `
+
+                <option value="${bookDoc.id}">
+
+                    ${book.title} (${book.quantity} available)
+
+                </option>
+
                 `;
 
             }
 
         });
 
-    }catch(err){
+    }
 
-        console.error(err);
+    catch (error) {
+
+        console.error(error);
 
     }
 
 }
-// =========================
-// LOAN BOOKS
-// =========================
-async function loanBook(){
 
-    try{
 
-        const borrowerName=document.getElementById("borrowerName").value.trim();
-        const borrowerPhone=document.getElementById("borrowerPhone").value.trim();
-        const borrowerEmail=document.getElementById("borrowerEmail").value.trim();
 
-        const bookId=document.getElementById("loanBookSelect").value;
+// ---------------------------
+// Delete Book
+// ---------------------------
 
-        const borrowDate=document.getElementById("borrowDate").value;
-        const dueDate=document.getElementById("dueDate").value;
+async function deleteBook(id) {
 
-        if(!borrowerName || !bookId){
+    const answer =
+        confirm("Delete this book permanently?");
 
-            alert("Complete all required fields.");
+    if (!answer) return;
+
+    try {
+
+        await deleteDoc(
+            doc(db, "books", id)
+        );
+
+        await loadBooks();
+
+        await updateDashboard();
+
+        showMessage("Book deleted.");
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+
+
+// ---------------------------
+// Edit Book
+// ---------------------------
+
+async function editBook(id) {
+
+    try {
+
+        const ref = doc(db, "books", id);
+
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+
+            showMessage("Book not found.");
+
             return;
 
         }
 
-        const bookRef=doc(db,"books",bookId);
-        const snap=await getDoc(bookRef);
+        const book = snap.data();
 
-        if(!snap.exists()){
+        const title =
+            prompt("Book Title", book.title);
 
-            alert("Book not found.");
+        if (title === null) return;
+
+        const author =
+            prompt("Author", book.author);
+
+        if (author === null) return;
+
+        const isbn =
+            prompt("ISBN", book.isbn || "");
+
+        const category =
+            prompt("Category", book.category || "");
+
+        const quantity =
+            parseInt(
+                prompt(
+                    "Quantity",
+                    book.quantity
+                )
+            );
+
+        await updateDoc(ref, {
+
+            title,
+            author,
+            isbn,
+            category,
+            quantity
+
+        });
+
+        await loadBooks();
+
+        showMessage("Book updated.");
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+
+
+// ---------------------------
+// Search Books
+// ---------------------------
+
+function searchBooks() {
+
+    const keyword =
+        document
+        .getElementById("search")
+        .value
+        .toLowerCase();
+
+    const rows =
+        bookTable.getElementsByTagName("tr");
+
+    for (let row of rows) {
+
+        const text =
+            row.textContent.toLowerCase();
+
+        row.style.display =
+            text.includes(keyword)
+                ? ""
+                : "none";
+
+    }
+
+}
+// ======================================================
+// LOAN MANAGEMENT
+// ======================================================
+
+// ---------------------------
+// Loan Book
+// ---------------------------
+
+async function loanBook() {
+
+    try {
+
+        const borrowerName =
+            document.getElementById("borrowerName").value.trim();
+
+        const borrowerPhone =
+            document.getElementById("borrowerPhone").value.trim();
+
+        const borrowerEmail =
+            document.getElementById("borrowerEmail").value.trim();
+
+        const bookId =
+            document.getElementById("loanBookSelect").value;
+
+        const borrowDate =
+            document.getElementById("borrowDate").value;
+
+        const dueDate =
+            document.getElementById("dueDate").value;
+
+        if (
+            !borrowerName ||
+            !borrowerPhone ||
+            !borrowerEmail ||
+            !bookId ||
+            !borrowDate ||
+            !dueDate
+        ) {
+            showMessage("Please complete all fields.");
+            return;
+        }
+
+        if (new Date(dueDate) < new Date(borrowDate)) {
+
+            showMessage(
+                "Due date cannot be earlier than borrow date."
+            );
+
             return;
 
         }
 
-        const book=snap.data();
+        const bookRef = doc(db, "books", bookId);
 
-        if(book.quantity<1){
+        const bookSnap = await getDoc(bookRef);
 
-            alert("Book unavailable.");
+        if (!bookSnap.exists()) {
+
+            showMessage("Book not found.");
+
             return;
 
         }
 
-        await addDoc(loansCollection,{
+        const book = bookSnap.data();
+
+        if (book.quantity <= 0) {
+
+            showMessage("Book is out of stock.");
+
+            return;
+
+        }
+
+        await addDoc(loansCollection, {
 
             borrowerName,
             borrowerPhone,
             borrowerEmail,
 
             bookId,
-            bookTitle:book.title,
+
+            bookTitle: book.title,
 
             borrowDate,
             dueDate,
 
-            status:"Borrowed",
+            status: "Borrowed",
 
-            createdAt:new Date()
-
-        });
-
-        await updateDoc(bookRef,{
-
-            quantity:book.quantity-1
+            createdAt: serverTimestamp()
 
         });
 
-        [
-            "borrowerName",
-            "borrowerPhone",
-            "borrowerEmail",
-            "loanBookSelect",
-            "borrowDate",
-            "dueDate"
-        ].forEach(id=>{
-            document.getElementById(id).value="";
+        await updateDoc(bookRef, {
+
+            quantity: book.quantity - 1
+
         });
+
+        clearLoanForm();
 
         await Promise.all([
+
             loadBooks(),
             loadLoans(),
             updateDashboard()
+
         ]);
 
-        alert("Book loaned successfully.");
+        showMessage("Book loaned successfully.");
 
-    }catch(err){
+    }
 
-        console.error(err);
-        alert("Unable to loan book.");
+    catch (error) {
+
+        console.error(error);
+
+        showMessage("Unable to loan book.");
 
     }
 
 }
-/ =========================
-// LOAD LOANS
-// =========================
-async function loadLoans(){
 
-    const table=document.getElementById("loanTable");
 
-    table.innerHTML="";
 
-    try{
+// ---------------------------
+// Load Loans
+// ---------------------------
 
-        const snapshot=await getDocs(loansCollection);
+async function loadLoans() {
 
-        snapshot.forEach(loanDoc=>{
+    try {
 
-            const loan=loanDoc.data();
+        loanTable.innerHTML = "";
 
-            table.innerHTML += `
+        const q = query(
+            loansCollection,
+            orderBy("createdAt", "desc")
+        );
+
+        const snapshot = await getDocs(q);
+
+        snapshot.forEach((loanDoc) => {
+
+            const loan = loanDoc.data();
+
+            const overdue =
+
+                loan.status === "Borrowed" &&
+
+                new Date(loan.dueDate) < new Date();
+
+            loanTable.innerHTML += `
+
             <tr>
+
                 <td>${loan.borrowerName}</td>
+
                 <td>${loan.bookTitle}</td>
-                <td>${loan.borrowDate}</td>
-                <td>${loan.dueDate}</td>
-                <td>${loan.status}</td>
+
+                <td>${formatDate(loan.borrowDate)}</td>
+
                 <td>
-                    ${
-                        loan.status==="Borrowed"
-                        ? `<button onclick="returnBook('${loanDoc.id}','${loan.bookId}')">Return</button>`
-                        : "-"
-                    }
+
+                    <span style="color:${overdue ? "red" : "inherit"}">
+
+                        ${formatDate(loan.dueDate)}
+
+                    </span>
+
                 </td>
+
+                <td>
+
+                    ${overdue
+                        ? "Overdue"
+                        : loan.status}
+
+                </td>
+
+                <td>
+
+                    ${loan.status === "Borrowed"
+
+                        ?
+
+                        `<button
+                            onclick="returnBook('${loanDoc.id}','${loan.bookId}')">
+
+                            Return
+
+                        </button>`
+
+                        :
+
+                        "Returned"
+
+                    }
+
+                </td>
+
             </tr>
+
             `;
 
         });
 
-    }catch(err){
+    }
 
-        console.error(err);
+    catch (error) {
+
+        console.error(error);
 
     }
 
 }
-// =========================
-// DELETE BOOK
-// =========================
 
-async function deleteBook(id){
 
-    if(!confirm("Delete this book?")) return;
 
-    try{
+// ---------------------------
+// Return Book
+// ---------------------------
 
-        await deleteDoc(doc(db,"books",id));
+async function returnBook(loanId, bookId) {
 
-        await Promise.all([
-            loadBooks(),
-            updateDashboard()
-        ]);
+    try {
 
-    }catch(err){
+        const loanRef =
+            doc(db, "loans", loanId);
 
-        console.error(err);
+        const bookRef =
+            doc(db, "books", bookId);
 
-    }
+        const loanSnap =
+            await getDoc(loanRef);
 
-}
-// =========================
-// DASHBOARD
-// =========================
-async function updateDashboard(){
+        const bookSnap =
+            await getDoc(bookRef);
 
-    const books=await getDocs(booksCollection);
-    const loans=await getDocs(loansCollection);
+        if (
+            !loanSnap.exists() ||
+            !bookSnap.exists()
+        ) {
 
-    document.getElementById("totalBooksCount").textContent=books.size;
+            showMessage("Unable to locate record.");
 
-    document.getElementById("totalLoansCount").textContent=loans.size;
+            return;
 
-    let overdue=0;
-
-    const today=new Date();
-
-    loans.forEach(doc=>{
-
-        const loan=doc.data();
-
-        if(
-            loan.status==="Borrowed" &&
-            new Date(loan.dueDate)<today
-        ){
-            overdue++;
         }
 
-    });
+        const book =
+            bookSnap.data();
 
-    document.getElementById("overdueCount").textContent=overdue;
+        await updateDoc(
+
+            loanRef,
+
+            {
+
+                status: "Returned",
+
+                returnedDate:
+
+                    new Date().toISOString()
+
+            }
+
+        );
+
+        await updateDoc(
+
+            bookRef,
+
+            {
+
+                quantity:
+
+                    book.quantity + 1
+
+            }
+
+        );
+
+        await Promise.all([
+
+            loadBooks(),
+
+            loadLoans(),
+
+            updateDashboard()
+
+        ]);
+
+        showMessage(
+
+            "Book returned successfully."
+
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
 
 }
-// =========================
-// GLOBAL FUNCTIONS
-// =========================
-
-window.addBook = addBook;
-window.deleteBook = deleteBook;
-
-// =========================
-// REGISTER THE NEW
-// =========================
-window.loanBook = loanBook;
-
-
-// =========================
-// START APP
-// =========================
-window.addBook=addBook;
-window.loanBook=loanBook;
-window.deleteBook=deleteBook;
-
-async function init(){
-
-    await Promise.all([
-        loadBooks(),
-        loadLoans(),
-        updateDashboard()
-    ]);
-
-}
-
-init();
-loadBooks();
-loadLoans();
-
